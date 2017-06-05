@@ -1,3 +1,7 @@
+media/
+.idea/
+.DS_STORE
+
 *.gem
 *.rbc
 /.config
