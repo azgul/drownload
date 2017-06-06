@@ -37,34 +37,34 @@ class Downloader
     end
   end
 
-  def self.get_json(url, limit = 10)
-    raise ArgumentError, 'HTTP redirect too deep' if limit == 0
+  def self.get_json(url, retries = 10)
+    raise ArgumentError, 'HTTP redirect too deep' if retries == 0
 
     uri = URI(url)
     response = Net::HTTP.get_response(uri)
 
     case response
       when Net::HTTPSuccess     then JSON.parse(response.body)
-      when Net::HTTPRedirection then get_json(response['location'], limit - 1)
+      when Net::HTTPRedirection then get_json(response['location'], retries - 1)
       else
-        Log.e "Error occurred while getting json for #{url}"
-        ap response.error!
+        Log.e "Error occurred while getting json for #{url}, retrying"
+        get_json(uri, retries - 1)
     end
   end
 
 
-  def self.http_get(url, limit = 10)
-    raise ArgumentError, 'HTTP redirect too deep' if limit == 0
+  def self.http_get(url, retries = 10)
+    raise ArgumentError, 'HTTP redirect too deep' if retries == 0
 
     uri = URI(url)
     response = Net::HTTP.get_response(uri)
 
     case response
       when Net::HTTPSuccess     then response
-      when Net::HTTPRedirection then http_get(response['location'], limit - 1)
+      when Net::HTTPRedirection then http_get(response['location'], retries - 1)
       else
-        Log.e "Error occurred while getting json for #{url}"
-        ap response.error!
+        Log.e "Error occurred while getting response for #{url}, retrying"
+        http_get(uri, retries - 1)
     end
   end
 
