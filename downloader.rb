@@ -23,7 +23,7 @@ class Downloader
       parse_items(json)
 
       while json['Paging'] && json['Paging']['Next']
-        json = get_json("#{url}#{channel}")
+        json = get_json(json['Paging']['Next'])
         parse_items(json)
       end
     end
